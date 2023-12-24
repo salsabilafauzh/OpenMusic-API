@@ -1,0 +1,67 @@
+const autoBind = require('auto-bind');
+
+class AlbumsHandler {
+  constructor(service, validator) {
+    this._service = service;
+    this._validator = validator;
+
+    autoBind(this);
+  }
+
+  async addAlbumHandler(req, h) {
+    await this._validator.validatePayloadAlbum(req.payload);
+    const id = await this._service.addAlbum(req.payload);
+    const response = h.response({
+      status: 'success',
+      message: 'Song berhasil ditambahkan',
+      data: {
+        albumId: id,
+      },
+    });
+    response.code(201);
+    return response;
+  }
+
+  async getAlbumByIdHandler(req, h) {
+    const { id } = req.params;
+    const data = await this._service.getAlbumById(id);
+    console.log(data);
+
+    const response = h.response({
+      status: 'success',
+      data: {
+        album: {
+          ...data,
+        },
+      },
+    });
+
+    response.code(200);
+    return response;
+  }
+
+  async updateAlbumByIdHandler(req, h) {
+    const { id } = req.params;
+    await this._validator.validatePayloadAlbum(req.payload);
+    await this._service.updateAlbumById(id, req.payload);
+    const response = h.response({
+      status: 'success',
+      message: 'Album berhasil di perbaharui',
+    });
+    response.code(200);
+    return response;
+  }
+
+  async deleteAlbumByIdHandler(req, h) {
+    const { id } = req.params;
+    await this._service.deleteAlbumById(id);
+    const response = h.response({
+      status: 'success',
+      message: 'Album berhasil di hapus',
+    });
+    response.code(200);
+    return response;
+  }
+}
+
+module.exports = AlbumsHandler;
