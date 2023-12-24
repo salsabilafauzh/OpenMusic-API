@@ -13,8 +13,8 @@ const init = async () => {
   const songsService = new SongsService();
   const albumService = new AlbumsService();
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
+    port: process.env.PORT || 5000,
+    host: process.env.HOST || 'localhost',
     routes: {
       cors: {
         origin: ['*'],
@@ -42,7 +42,6 @@ const init = async () => {
   server.ext('onPreResponse', (req, h) => {
     const { response } = req;
     if (response instanceof Error) {
-      // penanganan client error secara internal.
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',
