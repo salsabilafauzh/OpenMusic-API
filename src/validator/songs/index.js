@@ -1,5 +1,5 @@
 const ClientError = require('../../exceptions/ClientError');
-const { SongSchemaValidator } = require('./schema');
+const { SongSchemaValidator, QuerySchemaValidator } = require('./schema');
 const songValidation = {
   validatePayloadSong: (payload) => {
     const validationResult = SongSchemaValidator.validate(payload);
@@ -8,6 +8,12 @@ const songValidation = {
       throw new ClientError(validationResult.error.message);
     } else {
       payload.albumId = 'null';
+    }
+  },
+  validateQuerySearch: (query) => {
+    const validationResult = QuerySchemaValidator.validate(query);
+    if (validationResult.error) {
+      throw new ClientError(validationResult.error.message);
     }
   },
 };

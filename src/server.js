@@ -1,6 +1,6 @@
 const Hapi = require('@hapi/hapi');
 const dotenv = require('dotenv');
-const SongsService = require('./services/songsService');
+const SongsService = require('./services/SongsService');
 const AlbumsService = require('./services/AlbumsService');
 const ClientError = require('./exceptions/ClientError');
 const songValidation = require('./validator/songs');

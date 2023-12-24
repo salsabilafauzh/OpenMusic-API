@@ -1,4 +1,5 @@
 const autoBind = require('auto-bind');
+const { mapAlbumSongs } = require('../../utils');
 
 class AlbumsHandler {
   constructor(service, validator) {
@@ -10,6 +11,7 @@ class AlbumsHandler {
 
   async addAlbumHandler(req, h) {
     await this._validator.validatePayloadAlbum(req.payload);
+
     const id = await this._service.addAlbum(req.payload);
     const response = h.response({
       status: 'success',
@@ -24,14 +26,17 @@ class AlbumsHandler {
 
   async getAlbumByIdHandler(req, h) {
     const { id } = req.params;
-    const data = await this._service.getAlbumById(id);
-    console.log(data);
 
+    const data = await this._service.getAlbumById(id);
+    const newDataSongs = data[0].song_id !== null ? await data.map(mapAlbumSongs) : [];
     const response = h.response({
       status: 'success',
       data: {
         album: {
-          ...data,
+          id: data[0].album_id,
+          name: data[0].album_name,
+          year: data[0].album_year,
+          songs: newDataSongs,
         },
       },
     });
@@ -43,17 +48,20 @@ class AlbumsHandler {
   async updateAlbumByIdHandler(req, h) {
     const { id } = req.params;
     await this._validator.validatePayloadAlbum(req.payload);
+
     await this._service.updateAlbumById(id, req.payload);
     const response = h.response({
       status: 'success',
       message: 'Album berhasil di perbaharui',
     });
+
     response.code(200);
     return response;
   }
 
   async deleteAlbumByIdHandler(req, h) {
     const { id } = req.params;
+
     await this._service.deleteAlbumById(id);
     const response = h.response({
       status: 'success',

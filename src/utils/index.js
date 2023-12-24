@@ -1,8 +1,18 @@
-const mapAlbumSongs = ({ id, name, year, dataSongs }) => ({
-  id,
-  name,
-  year,
-  songs: dataSongs !== null ? dataSongs : [],
-});
+const mapAlbumSongs = (e) => {
+  const newObjSong = {
+    id: e.song_id,
+    title: e.song_title,
+    performer: e.song_performer,
+  };
+  return newObjSong;
+};
 
-module.exports = { mapAlbumSongs };
+const mapSearchSongs = (e) => {
+  const newObjSong = {
+    id: e.id,
+    title: e.title,
+    performer: e.performer,
+  };
+  return newObjSong;
+};
+module.exports = { mapAlbumSongs, mapSearchSongs };

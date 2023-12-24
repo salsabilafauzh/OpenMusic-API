@@ -10,24 +10,24 @@ class SongsService {
 
   async addSong({ title, year, genre, performer, duration, albumId }) {
     const id = nanoid(16);
-
     const query = {
       text: 'INSERT INTO songs (id, title, year,  performer, genre, duration, "albumId") VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
       values: [id, title, year, performer, genre, duration, albumId],
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows[0].id) {
       throw new ClientError('data gagal ditambahkan');
     }
+
     return result.rows[0].id;
   }
-
-  async getSongs() {
+  async getSongsByQuery(parameterValue) {
     const query = {
-      text: 'SELECT * FROM songs',
+      text: 'SELECT * FROM songs WHERE 1=1 AND title ILIKE $1 AND performer ILIKE $2',
+      values: [`%${parameterValue.title}%`, `%${parameterValue.performer}%`],
     };
+
     const result = await this._pool.query(query);
 
     return result.rows;
@@ -40,7 +40,6 @@ class SongsService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows.length) {
       throw new NotFoundError('data tidak ditemukan');
     }
@@ -55,7 +54,6 @@ class SongsService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows.length) {
       throw new NotFoundError('gagal diperbarui. Id tidak ditemukan');
     }
@@ -68,7 +66,6 @@ class SongsService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows.length) {
       throw new NotFoundError('gagal dihapus. Id tidak ditemukan');
     }

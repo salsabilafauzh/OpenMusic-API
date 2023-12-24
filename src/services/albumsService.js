@@ -2,7 +2,6 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const NotFoundError = require('../exceptions/NotFoundError');
 const ClientError = require('../exceptions/ClientError');
-const { mapAlbumSongs } = require('../utils');
 class AlbumsService {
   constructor() {
     this._pool = new Pool();
@@ -10,14 +9,12 @@ class AlbumsService {
 
   async addAlbum({ name, year }) {
     const id = nanoid(16);
-
     const query = {
       text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       values: [id, name, year],
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows[0].id) {
       throw new ClientError('data gagal ditambahkan');
     }
@@ -27,17 +24,24 @@ class AlbumsService {
 
   async getAlbumById(id) {
     const query = {
-      text: 'SELECT * FROM albums LEFT JOIN songs ON albums.id = songs."albumId" WHERE albums.id = $1',
+      text: `SELECT
+      a.id as album_id, a.name as album_name, a.year as album_year,
+      s.id as song_id, s.title as song_title, s.performer as song_performer
+    FROM
+      albums a
+    LEFT JOIN
+      songs s ON a.id = s."albumId"
+    WHERE
+      a.id = $1`,
       values: [id],
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows.length) {
       throw new NotFoundError('data tidak ditemukan');
     }
 
-    return result.rows.map(mapAlbumSongs)[0];
+    return result.rows;
   }
 
   async updateAlbumById(id, { name, year }) {
@@ -59,7 +63,6 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows.length) {
       throw new NotFoundError('gagal menghapus, data tidak ditemukan.');
     }

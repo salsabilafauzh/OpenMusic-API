@@ -8,7 +8,11 @@ const SongSchemaValidator = Joi.object({
   duration: Joi.number(),
   albumId: Joi.string().allow(null).default(null),
 });
-
+const QuerySchemaValidator = Joi.object({
+  title: Joi.string().empty(''),
+  performer: Joi.string().empty(''),
+});
 module.exports = {
   SongSchemaValidator,
+  QuerySchemaValidator,
 };
