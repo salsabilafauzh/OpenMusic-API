@@ -37,7 +37,7 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('data tidak ditemukan');
     }
 
@@ -51,7 +51,7 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('gagal memperbarui, data tidak ditemukan');
     }
   }
@@ -63,7 +63,7 @@ class AlbumsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('gagal menghapus, data tidak ditemukan.');
     }
   }

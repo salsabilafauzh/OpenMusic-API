@@ -40,7 +40,7 @@ class SongsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('data tidak ditemukan');
     }
 
@@ -54,7 +54,7 @@ class SongsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('gagal diperbarui. Id tidak ditemukan');
     }
   }
@@ -66,7 +66,7 @@ class SongsService {
     };
 
     const result = await this._pool.query(query);
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('gagal dihapus. Id tidak ditemukan');
     }
   }
