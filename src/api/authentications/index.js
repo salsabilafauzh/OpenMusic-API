@@ -1,5 +1,6 @@
 const AuthHandler = require('./handler');
 const routes = require('./routes');
+
 const registerAuth = {
   name: 'auth',
   version: '1.0.0',

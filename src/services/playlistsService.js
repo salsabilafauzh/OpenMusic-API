@@ -3,9 +3,11 @@ const InvariantError = require('../exceptions/InvariantError');
 const NotFoundError = require('../exceptions/NotFoundError');
 const AuthorizationError = require('../exceptions/AuthorizationError');
 const { nanoid } = require('nanoid');
+
 class PlaylistService {
-  constructor() {
+  constructor(CollaborationsService) {
     this._pool = new Pool();
+    this._collaborationsService = CollaborationsService;
   }
 
   async addPlaylist(name, owner) {
@@ -31,11 +33,9 @@ class PlaylistService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rows[0].id) {
       throw new InvariantError('data gagal ditambahkan');
     }
-
     return result.rows[0].id;
   }
 
@@ -103,9 +103,19 @@ class PlaylistService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rowCount) {
       throw new NotFoundError('gagal menghapus, data tidak ditemukan.');
+    }
+  }
+  async verifyNewUserPlaylist(name, userId) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE name = $1 AND  owner = $2',
+      values: [name, userId],
+    };
+
+    const result = await this._pool.query(query);
+    if (result.rowCount) {
+      throw new InvariantError(`Playlist ${name} already exist`);
     }
   }
 
@@ -116,15 +126,28 @@ class PlaylistService {
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rowCount) {
       throw new NotFoundError('data tidak ditemukan');
     }
 
     const owner_playlist = result.rows[0].owner;
-
     if (owner_playlist !== userId) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
+    }
+  }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      try {
+        await this._collaborationsService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
     }
   }
 }

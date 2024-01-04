@@ -57,7 +57,7 @@ class PlaylistHandler {
   async getPlaylistWithSongsHandler(req) {
     const { id: playlistId } = req.params;
     const { id: credentialId } = req.auth.credentials;
-    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     const data = await this._playlistsService.getPlaylistWithSongs(playlistId);
     const newDataSongs = data[0].song_id !== null ? await data.map(mapAlbumSongs) : [];
     return {
