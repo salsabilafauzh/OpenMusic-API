@@ -48,6 +48,18 @@ class CollaborationsService {
       throw new InvariantError('Forbidden access');
     }
   }
+
+  async verifyExistCollabolator(userId) {
+    const query = {
+      text: 'select * from users where id = $1',
+      values: [userId],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('User not found');
+    }
+  }
 }
 
 module.exports = CollaborationsService;

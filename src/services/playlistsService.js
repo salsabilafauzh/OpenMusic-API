@@ -107,17 +107,6 @@ class PlaylistService {
       throw new NotFoundError('gagal menghapus, data tidak ditemukan.');
     }
   }
-  async verifyNewUserPlaylist(name, userId) {
-    const query = {
-      text: 'SELECT * FROM playlists WHERE name = $1 AND  owner = $2',
-      values: [name, userId],
-    };
-
-    const result = await this._pool.query(query);
-    if (result.rowCount) {
-      throw new InvariantError(`Playlist ${name} already exist`);
-    }
-  }
 
   async verifyPlaylistOwner(playlistId, userId) {
     const query = {
@@ -127,7 +116,7 @@ class PlaylistService {
 
     const result = await this._pool.query(query);
     if (!result.rowCount) {
-      throw new NotFoundError('data tidak ditemukan');
+      throw new NotFoundError('playlist tidak ditemukan');
     }
 
     const owner_playlist = result.rows[0].owner;
