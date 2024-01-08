@@ -20,6 +20,7 @@ class CollaborationsService {
     if (!result.rows[0].id) {
       throw new InvariantError('data gagal ditambahkan');
     }
+
     return result.rows[0].id;
   }
 
@@ -49,13 +50,14 @@ class CollaborationsService {
     }
   }
 
-  async verifyExistCollabolator(userId) {
+  async verifyExistCollaborator(userId) {
     const query = {
-      text: 'select * from users where id = $1',
+      text: 'SELECT * FROM users WHERE id = $1',
       values: [userId],
     };
 
     const result = await this._pool.query(query);
+
     if (!result.rowCount) {
       throw new NotFoundError('User not found');
     }

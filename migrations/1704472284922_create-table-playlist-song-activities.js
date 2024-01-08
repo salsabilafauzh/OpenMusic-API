@@ -29,8 +29,6 @@ exports.up = (pgm) => {
       default: pgm.func('current_timestamp'),
     },
   });
-
-  //   pgm.addConstraint('playlist_song_activities', 'fk_playlist_song_activities.playlistId_playlists.id', 'FOREIGN KEY("playlistId") REFERENCES playlists(id) ');
 };
 
 exports.down = (pgm) => {
