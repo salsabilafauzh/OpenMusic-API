@@ -24,21 +24,12 @@ class ActivitiesService {
 
   async getActivities(playlistId) {
     const query = {
-      //   text: 'SELECT action, time FROM playlist_song_activities WHERE "playlistId" = $1',
-      //   text: `SELECT  u.username, s.title, a.action, a.time
-      //   FROM playlists p
-      //   LEFT JOIN playlist_song_activities a ON p.id = a."playlistId"
-      //   LEFT JOIN users u ON p.owner = u.id
-      //   LEFT JOIN playlist_songs ps ON p.id = ps."playlistId"
-      //   LEFT JOIN songs s ON ps."songId" = s.id
-      //   WHERE p.id = $1`,
       text: `SELECT  u.username, s.title, a.action, a.time
       FROM playlist_song_activities a
       LEFT JOIN playlists p ON a."playlistId" = p.id
       LEFT JOIN users u ON a."userId" = u.id
       LEFT JOIN songs s ON a."songId" = s.id
       WHERE a."playlistId" = $1`,
-      //   text: 'select * from playlist_song_activities where "playlistId" = $1',
 
       values: [playlistId],
     };
