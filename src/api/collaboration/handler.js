@@ -30,8 +30,8 @@ class CollaborationsHandler {
   async deleteCollaborationHandler(req) {
     await this._validator.validatePayloadCollaboration(req.payload);
     const { playlistId, userId } = req.payload;
-
-    await this._playlistsService.verifyPlaylistOwner(playlistId, userId);
+    const { id: credentialId } = req.auth.credentials;
+    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
     await this._collaborationsService.deleteCollaboration(playlistId, userId);
 
     return {

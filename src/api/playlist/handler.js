@@ -33,10 +33,9 @@ class PlaylistHandler {
     const { id: playlistId } = req.params;
     const { songId } = req.payload;
     await this._songsService.verifySong(songId);
-    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._playlistsService.addSongToPlaylist(playlistId, songId);
-    const dataActivity = await this._activitiesService.addNewActivities(playlistId, songId, credentialId, 'add');
-    console.log(`was added by ${credentialId},songs:${songId} in playlist ${playlistId}, data:${dataActivity}`);
+    await this._activitiesService.addNewActivities(playlistId, songId, credentialId, 'add');
     const response = h.response({
       status: 'success',
       message: 'song has been added to the album',
@@ -48,7 +47,6 @@ class PlaylistHandler {
   async getPlaylistsHandler(req) {
     const { id: credentialId } = req.auth.credentials;
     const playlist = await this._playlistsService.getPlaylists(credentialId);
-    console.log(playlist);
     return {
       status: 'success',
       data: {
@@ -94,11 +92,9 @@ class PlaylistHandler {
     const { id: credentialId } = req.auth.credentials;
     await this._validator.validatePayloadSongToPlaylist(req.payload);
     const { songId } = req.payload;
-    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
-
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._playlistsService.deleteSongFromPlaylist(playlistId, songId);
-    const dataActivity = await this._activitiesService.addNewActivities(playlistId, songId, credentialId, 'delete');
-    console.log(`was deleted by ${credentialId},songs:${songId} in playlist ${playlistId}, data:${dataActivity}`);
+    await this._activitiesService.addNewActivities(playlistId, songId, credentialId, 'delete');
     return {
       status: 'success',
       message: 'song has been deleted from playlist',
