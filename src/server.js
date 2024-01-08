@@ -125,7 +125,6 @@ const init = async () => {
 
   server.ext('onPreResponse', (req, h) => {
     const { response } = req;
-    console.log(response.message);
     if (response instanceof Error) {
       if (response instanceof ClientError) {
         const newResponse = h.response({
