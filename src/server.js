@@ -22,6 +22,11 @@ const playlistValidation = require('./validator/playlists');
 const collaborationValidation = require('./validator/collaborations');
 const tokenManager = require('./tokenize/TokenManager');
 
+//RabbitMQ - Export
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const registerExport = require('./api/exports');
+const exportValidation = require('./validator/exports');
+
 dotenv.config();
 
 const init = async () => {
@@ -109,6 +114,13 @@ const init = async () => {
         playlistsService: playlistsService,
         collaborationsService: collaborationsService,
         validator: collaborationValidation,
+      },
+    },
+    {
+      plugin: registerExport,
+      opstions: {
+        exportService: ProducerService,
+        validator: exportValidation,
       },
     },
   ]);

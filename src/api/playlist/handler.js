@@ -91,7 +91,7 @@ class PlaylistHandler {
     const { id: credentialId } = req.auth.credentials;
     await this._validator.validatePayloadSongToPlaylist(req.payload);
     const { songId } = req.payload;
-    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._playlistsService.deleteSongFromPlaylist(playlistId, songId);
 
     return {
