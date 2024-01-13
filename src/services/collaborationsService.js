@@ -20,6 +20,7 @@ class CollaborationsService {
     if (!result.rows[0].id) {
       throw new InvariantError('data gagal ditambahkan');
     }
+
     return result.rows[0].id;
   }
 
@@ -46,6 +47,19 @@ class CollaborationsService {
 
     if (!result.rowCount) {
       throw new InvariantError('Forbidden access');
+    }
+  }
+
+  async verifyExistCollaborator(userId) {
+    const query = {
+      text: 'SELECT * FROM users WHERE id = $1',
+      values: [userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('User not found');
     }
   }
 }

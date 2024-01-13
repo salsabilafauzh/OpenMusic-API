@@ -7,6 +7,7 @@ const AuthService = require('./services/authService');
 const UsersService = require('./services/usersService');
 const CollaborationsService = require('./services/collaborationsService');
 const PlaylistService = require('./services/playlistsService');
+const ActivitiesService = require('./services/activitiesService');
 const ClientError = require('./exceptions/ClientError');
 const registerSong = require('./api/song');
 const registerAlbum = require('./api/album');
@@ -14,6 +15,7 @@ const registerUser = require('./api/user');
 const registerAuth = require('./api/authentications');
 const registerPlaylist = require('./api/playlist');
 const registerCollab = require('./api/collaboration');
+const registerActivities = require('./api/activities');
 const songValidation = require('./validator/songs');
 const albumValidation = require('./validator/albums');
 const userValidation = require('./validator/users');
@@ -31,7 +33,7 @@ const init = async () => {
   const usersService = new UsersService();
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistService(collaborationsService);
-
+  const activitiesService = new ActivitiesService();
   const server = Hapi.server({
     port: process.env.PORT || 5000,
     host: process.env.HOST || 'localhost',
@@ -100,6 +102,7 @@ const init = async () => {
       options: {
         playlistsService: playlistsService,
         songsService: songsService,
+        activitiesService: activitiesService,
         validator: playlistValidation,
       },
     },
@@ -111,11 +114,17 @@ const init = async () => {
         validator: collaborationValidation,
       },
     },
+    {
+      plugin: registerActivities,
+      options: {
+        activitiesService: activitiesService,
+        playlistsService: playlistsService,
+      },
+    },
   ]);
 
   server.ext('onPreResponse', (req, h) => {
     const { response } = req;
-    console.log(response.message);
     if (response instanceof Error) {
       if (response instanceof ClientError) {
         const newResponse = h.response({
