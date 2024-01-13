@@ -1,9 +1,11 @@
 const autoBind = require('auto-bind');
 const { mapAlbumSongs } = require('../../utils/index');
+
 class PlaylistHandler {
-  constructor(playlistsService, songsService, validator) {
+  constructor(playlistsService, songsService, activitiesService, validator) {
     this._playlistsService = playlistsService;
     this._songsService = songsService;
+    this._activitiesService = activitiesService;
     this._validator = validator;
 
     autoBind(this);
@@ -31,9 +33,9 @@ class PlaylistHandler {
     const { id: playlistId } = req.params;
     const { songId } = req.payload;
     await this._songsService.verifySong(songId);
-    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._playlistsService.addSongToPlaylist(playlistId, songId);
-
+    await this._activitiesService.addNewActivities(playlistId, songId, credentialId, 'add');
     const response = h.response({
       status: 'success',
       message: 'song has been added to the album',
@@ -45,7 +47,6 @@ class PlaylistHandler {
   async getPlaylistsHandler(req) {
     const { id: credentialId } = req.auth.credentials;
     const playlist = await this._playlistsService.getPlaylists(credentialId);
-
     return {
       status: 'success',
       data: {
@@ -93,7 +94,7 @@ class PlaylistHandler {
     const { songId } = req.payload;
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._playlistsService.deleteSongFromPlaylist(playlistId, songId);
-
+    await this._activitiesService.addNewActivities(playlistId, songId, credentialId, 'delete');
     return {
       status: 'success',
       message: 'song has been deleted from playlist',

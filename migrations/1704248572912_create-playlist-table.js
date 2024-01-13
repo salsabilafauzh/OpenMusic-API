@@ -15,10 +15,10 @@ exports.up = (pgm) => {
       onUpdate: 'CASCADE',
     },
   });
-  pgm.addConstraint('playlists', 'unique_name_and_owner', 'UNIQUE(name, owner)');
   pgm.addConstraint('playlists', 'fk_playlists.owner_users_id', 'FOREIGN KEY(owner) REFERENCES users(id)');
 };
 
 exports.down = (pgm) => {
+  pgm.dropConstraint('playlists', 'unique_name_and_owner', { ifExists: true });
   pgm.dropTable('playlists');
 };
