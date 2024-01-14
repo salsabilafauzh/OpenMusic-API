@@ -10,6 +10,7 @@ const UsersService = require('./services/usersService');
 const CollaborationsService = require('./services/collaborationsService');
 const PlaylistService = require('./services/playlistsService');
 const ActivitiesService = require('./services/activitiesService');
+const LikesAlbumService = require('./services/likesAlbumService.js');
 const StorageService = require('./services/storage/StorageService.js');
 const ClientError = require('./exceptions/ClientError');
 const registerSong = require('./api/song');
@@ -20,6 +21,7 @@ const registerPlaylist = require('./api/playlist');
 const registerCollab = require('./api/collaboration');
 const registerActivities = require('./api/activities');
 const registerUpload = require('./api/uploads');
+const registerLikes = require('./api/likesAlbum');
 const songValidation = require('./validator/songs');
 const albumValidation = require('./validator/albums');
 const userValidation = require('./validator/users');
@@ -44,6 +46,8 @@ const init = async () => {
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistService(collaborationsService);
   const activitiesService = new ActivitiesService();
+  const likesAlbumService = new LikesAlbumService();
+
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
   const server = Hapi.server({
     port: process.env.PORT || 5000,
@@ -151,10 +155,18 @@ const init = async () => {
         validator: uploadValidation,
       },
     },
+    {
+      plugin: registerLikes,
+      options: {
+        LikesAlbumService: likesAlbumService,
+        AlbumsService: albumService,
+      },
+    },
   ]);
 
   server.ext('onPreResponse', (req, h) => {
     const { response } = req;
+    console.log(response.message);
     if (response instanceof Error) {
       if (response instanceof ClientError) {
         const newResponse = h.response({

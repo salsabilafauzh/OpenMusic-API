@@ -29,6 +29,7 @@ class AlbumsHandler {
 
     const data = await this._service.getAlbumById(id);
     const newDataSongs = data[0].song_id !== null ? await data.map(mapAlbumSongs) : [];
+    const coverUrl = data[0].cover !== null ? `http://${process.env.HOST}:${process.env.PORT}/upload/images/${data[0].cover}` : null;
     const response = h.response({
       status: 'success',
       data: {
@@ -36,7 +37,7 @@ class AlbumsHandler {
           id: data[0].album_id,
           name: data[0].album_name,
           year: data[0].album_year,
-          coverUrl: `http://${process.env.HOST}:${process.env.PORT}/upload/images/${data[0].cover}`,
+          coverUrl: coverUrl,
           songs: newDataSongs,
         },
       },
@@ -49,13 +50,12 @@ class AlbumsHandler {
   async updateAlbumByIdHandler(req, h) {
     const { id } = req.params;
     await this._validator.validatePayloadAlbum(req.payload);
-
     await this._service.updateAlbumById(id, req.payload);
+
     const response = h.response({
       status: 'success',
       message: 'Album berhasil di perbaharui',
     });
-
     response.code(200);
     return response;
   }
