@@ -25,7 +25,7 @@ class AlbumsService {
   async getAlbumById(id) {
     const query = {
       text: `SELECT
-      a.id as album_id, a.name as album_name, a.year as album_year,
+      a.id as album_id, a.name as album_name, a.year as album_year, a.cover,
       s.id as song_id, s.title as song_title, s.performer as song_performer
     FROM
       albums a
@@ -56,6 +56,18 @@ class AlbumsService {
     }
   }
 
+  async updateAlbumCoverById(id, cover) {
+    const query = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id',
+      values: [cover, id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('gagal memperbarui, data tidak ditemukan');
+    }
+  }
+
   async deleteAlbumById(id) {
     const query = {
       text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
@@ -65,6 +77,18 @@ class AlbumsService {
     const result = await this._pool.query(query);
     if (!result.rowCount) {
       throw new NotFoundError('gagal menghapus, data tidak ditemukan.');
+    }
+  }
+
+  async verifyIfExistAlbum(id) {
+    const query = {
+      text: 'SELECT * FROM albums WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('data tidak ditemukan.');
     }
   }
 }

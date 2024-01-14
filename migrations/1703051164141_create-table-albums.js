@@ -12,6 +12,10 @@ exports.up = (pgm) => {
       type: 'integer',
       notNull: true,
     },
+    cover: {
+      type: 'TEXT',
+      default: null,
+    },
   });
 };
 
