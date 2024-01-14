@@ -1,6 +1,8 @@
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const dotenv = require('dotenv');
+const Inert = require('@hapi/inert');
+const path = require('path');
 const SongsService = require('./services/SongsService');
 const AlbumsService = require('./services/AlbumsService');
 const AuthService = require('./services/authService');
@@ -8,6 +10,7 @@ const UsersService = require('./services/usersService');
 const CollaborationsService = require('./services/collaborationsService');
 const PlaylistService = require('./services/playlistsService');
 const ActivitiesService = require('./services/activitiesService');
+const StorageService = require('./services/storage/StorageService.js');
 const ClientError = require('./exceptions/ClientError');
 const registerSong = require('./api/song');
 const registerAlbum = require('./api/album');
@@ -16,12 +19,14 @@ const registerAuth = require('./api/authentications');
 const registerPlaylist = require('./api/playlist');
 const registerCollab = require('./api/collaboration');
 const registerActivities = require('./api/activities');
+const registerUpload = require('./api/uploads');
 const songValidation = require('./validator/songs');
 const albumValidation = require('./validator/albums');
 const userValidation = require('./validator/users');
 const authValidation = require('./validator/authentications');
 const playlistValidation = require('./validator/playlists');
 const collaborationValidation = require('./validator/collaborations');
+const uploadValidation = require('./validator/uploads');
 const tokenManager = require('./tokenize/TokenManager');
 
 //Export
@@ -39,6 +44,7 @@ const init = async () => {
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistService(collaborationsService);
   const activitiesService = new ActivitiesService();
+  const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
   const server = Hapi.server({
     port: process.env.PORT || 5000,
     host: process.env.HOST || 'localhost',
@@ -52,6 +58,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     },
   ]);
 
@@ -132,6 +141,14 @@ const init = async () => {
         exportService: ProducerService,
         playlistsService: playlistsService,
         validator: exportValidation,
+      },
+    },
+    {
+      plugin: registerUpload,
+      options: {
+        storageService: storageService,
+        albumsService: albumService,
+        validator: uploadValidation,
       },
     },
   ]);

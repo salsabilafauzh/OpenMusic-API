@@ -36,6 +36,7 @@ class AlbumsHandler {
           id: data[0].album_id,
           name: data[0].album_name,
           year: data[0].album_year,
+          coverUrl: `http://${process.env.HOST}:${process.env.PORT}/upload/images/${data[0].cover}`,
           songs: newDataSongs,
         },
       },

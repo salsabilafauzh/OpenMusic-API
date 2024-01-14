@@ -25,7 +25,7 @@ class AlbumsService {
   async getAlbumById(id) {
     const query = {
       text: `SELECT
-      a.id as album_id, a.name as album_name, a.year as album_year,
+      a.id as album_id, a.name as album_name, a.year as album_year, a.cover,
       s.id as song_id, s.title as song_title, s.performer as song_performer
     FROM
       albums a
@@ -48,6 +48,18 @@ class AlbumsService {
     const query = {
       text: 'UPDATE albums SET name = $1, year = $2 WHERE id = $3 RETURNING id',
       values: [name, year, id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('gagal memperbarui, data tidak ditemukan');
+    }
+  }
+
+  async updateAlbumCoverById(id, cover) {
+    const query = {
+      text: 'UPDATE albums SET cover = $1 WHERE id = $2 RETURNING id',
+      values: [cover, id],
     };
 
     const result = await this._pool.query(query);
