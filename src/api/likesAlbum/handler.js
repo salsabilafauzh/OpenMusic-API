@@ -24,17 +24,19 @@ class LikesAlbumHandler {
 
   async getCountLikesAlbum(req, h) {
     const { id: albumId } = req.params;
-    const { count } = await this._likesAlbumService.getCountLikesAlbum(albumId);
-    const likes = parseInt(count);
+    const { result, isCache } = await this._likesAlbumService.getCountLikesAlbum(albumId);
+    const likes = parseInt(result);
 
-    const response = h
-      .response({
-        status: 'success',
-        data: {
-          likes: likes,
-        },
-      })
-      .header('X-Data-Source', 'cache');
+    const response = h.response({
+      status: 'success',
+      data: {
+        likes: likes,
+      },
+    });
+
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    }
     response.code(200);
     return response;
   }
