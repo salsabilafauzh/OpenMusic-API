@@ -11,9 +11,9 @@ class UploadHandler {
   async uploadFileCover(req, h) {
     const { cover } = req.payload;
     await this._validator.validateUploadPayload(cover.hapi.headers);
-    const { id: idAlbum } = req.params;
+    const { id: albumId } = req.params;
     const filename = await this._storageService.writeFile(cover, cover.hapi);
-    await this._albumsService.updateAlbumCoverById(idAlbum, filename);
+    await this._albumsService.updateAlbumCoverById(albumId, filename);
 
     const response = h.response({
       status: 'success',

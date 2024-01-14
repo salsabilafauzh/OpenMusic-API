@@ -11,6 +11,7 @@ const CollaborationsService = require('./services/collaborationsService');
 const PlaylistService = require('./services/playlistsService');
 const ActivitiesService = require('./services/activitiesService');
 const LikesAlbumService = require('./services/likesAlbumService.js');
+const CacheService = require('./services/redis/CacheService.js');
 const StorageService = require('./services/storage/StorageService.js');
 const ClientError = require('./exceptions/ClientError');
 const registerSong = require('./api/song');
@@ -46,7 +47,8 @@ const init = async () => {
   const collaborationsService = new CollaborationsService();
   const playlistsService = new PlaylistService(collaborationsService);
   const activitiesService = new ActivitiesService();
-  const likesAlbumService = new LikesAlbumService();
+  const cacheService = new CacheService();
+  const likesAlbumService = new LikesAlbumService(cacheService);
 
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'));
   const server = Hapi.server({
@@ -166,7 +168,6 @@ const init = async () => {
 
   server.ext('onPreResponse', (req, h) => {
     const { response } = req;
-    console.log(response.message);
     if (response instanceof Error) {
       if (response instanceof ClientError) {
         const newResponse = h.response({

@@ -8,11 +8,11 @@ class LikesAlbumHandler {
   }
 
   async postLikesAlbum(req, h) {
-    const { id: idAlbum } = req.params;
-    const { id: idUser } = req.auth.credentials;
-    await this._albumsService.verifyIfExistAlbum(idAlbum);
-    await this._likesAlbumService.verifyLikes(idAlbum, idUser);
-    await this._likesAlbumService.postLikesAlbum(idAlbum, idUser);
+    const { id: albumId } = req.params;
+    const { id: userId } = req.auth.credentials;
+    await this._albumsService.verifyIfExistAlbum(albumId);
+    await this._likesAlbumService.verifyLikes(albumId, userId);
+    await this._likesAlbumService.postLikesAlbum(albumId, userId);
 
     const response = h.response({
       status: 'success',
@@ -22,23 +22,27 @@ class LikesAlbumHandler {
     return response;
   }
 
-  async getCountLikesAlbum(req) {
-    const { id: idAlbum } = req.params;
-    const { count } = await this._likesAlbumService.getCountLikesAlbum(idAlbum);
+  async getCountLikesAlbum(req, h) {
+    const { id: albumId } = req.params;
+    const { count } = await this._likesAlbumService.getCountLikesAlbum(albumId);
     const likes = parseInt(count);
 
-    return {
-      status: 'success',
-      data: {
-        likes: likes,
-      },
-    };
+    const response = h
+      .response({
+        status: 'success',
+        data: {
+          likes: likes,
+        },
+      })
+      .header('X-Data-Source', 'cache');
+    response.code(200);
+    return response;
   }
 
   async deleteLikesAlbum(req) {
-    const { id: idAlbum } = req.params;
-    const { id: idUser } = req.auth.credentials;
-    await this._likesAlbumService.deleteLikesAlbum(idAlbum, idUser);
+    const { id: albumId } = req.params;
+    const { id: userId } = req.auth.credentials;
+    await this._likesAlbumService.deleteLikesAlbum(albumId, userId);
 
     return {
       status: 'success',
